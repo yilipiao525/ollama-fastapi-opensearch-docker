@@ -9,6 +9,12 @@ services:
       - ./fastapi:/app
     networks:
       - llama-net
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+
   ollama:
     build: ollama
     ports:
@@ -19,10 +25,48 @@ services:
       - llama-net
     entrypoint: ["/usr/bin/bash", "/pull-llama3.sh"]
 
+  # OpenSearch service configuration
+  opensearch:
+    image: opensearchproject/opensearch:2.9.0
+    container_name: opensearch
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - 9200:9200  # OpenSearch HTTP API
+      - 9600:9600 # Performance Analyzer
+    networks:
+      - llama-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+  # (Optional) OpenSearch Dashboards
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:2.9.0
+    container_name: opensearch-dashboards
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+    ports:
+      - "5601:5601"
+    networks:
+      - llama-net
+    depends_on:
+      - opensearch
+
 networks:
   llama-net:
     driver: bridge
 
 volumes:
   llama-vol:
+    driver: local
+  opensearch-data:
     driver: local

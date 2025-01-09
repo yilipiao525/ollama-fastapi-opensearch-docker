@@ -1,35 +1,28 @@
-version: '3.0'
+version: "3"
 
 services:
-  # FastAPI service configuration
   web:
-    build: fastapi                # Build from ./fastapi/Dockerfile
+    build: fastapi
     ports:
-      - 8000:8000                # Map host port 8000 to container port 8000
+      - 8000:8000
     volumes:
-      - ./fastapi:/app           # Mount local fastapi directory to /app in container
+      - ./fastapi:/app
     networks:
-      - ollama-network           # Connect to the ollama network
-    depends_on:
-      - ollama
-
-  # Ollama service configuration
+      - llama-net
   ollama:
-    build: ollama                # Build from ./ollama/Dockerfile
+    build: ollama
     ports:
-      - 11434:11434             # Map host port 11434 to container port 11434 (Ollama API)
+      - 11434:11434
     volumes:
-      - ollama-vol:/ollama      # Mount named volume for persistent Ollama data
+      - llama-vol:/ollama
     networks:
-      - ollama-network          # Connect to the ollama network
-    entrypoint: ["/usr/bin/bash", "/pull-llama.sh"]  # Run pull-llama.sh on startup
+      - llama-net
+    entrypoint: ["/usr/bin/bash", "/pull-llama3.sh"]
 
-# Define named volumes for persistent data
-volumes:
-  ollama-vol:                    # Named volume for Ollama data
-    driver: local               # Use local driver for volume
-
-# Define networks for service communication
 networks:
-  ollama-network:               # Network for FastAPI and Ollama communication
-    driver: bridge             # Use bridge network driver
+  llama-net:
+    driver: bridge
+
+volumes:
+  llama-vol:
+    driver: local

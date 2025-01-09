@@ -51,7 +51,8 @@ app = FastAPI(lifespan=lifespan)
 OLLAMA_URL =  "http://ollama:11434"   #//for docker compose
 # OLLAMA_URL =  "http://localhost:11434"  #//for local
 LLM_SERVER_URL = f"{OLLAMA_URL}/api/generate"
-MODEL_NAME = "llama3.2:latest"
+# MODEL_NAME = "llama3.2:latest"
+MODEL_NAME ="gemma2:2b"
 system_prompt = "Your name is Fasta. You are a fast food ordering drive thru AI assistant."
 
 @app.post("/generate-answer")
@@ -110,3 +111,41 @@ def do_search(q: str):
 @app.get('/')
 def home():
     return {"hello" : "World"}
+
+@app.get("/index-info")
+def get_index_info():
+    """Get information about the my-index"""
+    try:
+        # Get index settings and mappings
+        index_info = os_client.get_index_info("my-index")
+        return index_info
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting index info: {str(e)}"
+        )
+
+@app.get("/index-stats")
+def get_index_stats():
+    """Get statistics about the my-index"""
+    try:
+        # Get index statistics
+        stats = os_client.get_index_stats("my-index")
+        return stats
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting index stats: {str(e)}"
+        )
+
+@app.get("/list-indices")
+def list_indices():
+    """List all indices"""
+    try:
+        indices = os_client.list_indices()
+        return {"indices": indices}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error listing indices: {str(e)}"
+        )

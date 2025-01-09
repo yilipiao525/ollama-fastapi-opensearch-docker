@@ -70,3 +70,15 @@ class OpenSearchClient:
             print(f"Deleted index {index_name}")
         else:
             print(f"Index {index_name} does not exist.")
+
+    def get_index_info(self, index_name):
+        """Get information about an index"""
+        return self.client.indices.get(index=index_name)
+
+    def get_index_stats(self, index_name):
+        """Get statistics about an index"""
+        return self.client.indices.stats(index=index_name)
+
+    def list_indices(self):
+        """List all indices"""
+        return list(self.client.indices.get_alias().keys())

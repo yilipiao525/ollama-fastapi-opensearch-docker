@@ -39,10 +39,17 @@ deactivate nondestructive
 if [ "${OSTYPE:-}" = "cygwin" ] || [ "${OSTYPE:-}" = "msys" ] ; then
     # transform D:\path\to\venv to /d/path/to/venv on MSYS
     # and to /cygdrive/d/path/to/venv on Cygwin
+<<<<<<< HEAD
     export VIRTUAL_ENV=$(cygpath "/Users/sarthak/Documents/Try/tutorial/fastapi/.venv")
 else
     # use the path as-is
     export VIRTUAL_ENV="/Users/sarthak/Documents/Try/tutorial/fastapi/.venv"
+=======
+    export VIRTUAL_ENV=$(cygpath "/Users/ellenpark/Desktop/study/ollama-docker-fastapi-opensearch/fastapi/.venv")
+else
+    # use the path as-is
+    export VIRTUAL_ENV="/Users/ellenpark/Desktop/study/ollama-docker-fastapi-opensearch/fastapi/.venv"
+>>>>>>> origin/main
 fi
 
 _OLD_VIRTUAL_PATH="$PATH"

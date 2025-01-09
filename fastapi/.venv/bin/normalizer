@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #!/Users/sarthak/Documents/Try/tutorial/fastapi/.venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
@@ -6,3 +7,13 @@ from charset_normalizer.cli import cli_detect
 if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
     sys.exit(cli_detect())
+=======
+#!/Users/ellenpark/Desktop/study/ollama-docker-fastapi-opensearch/fastapi/.venv/bin/python3.12
+# -*- coding: utf-8 -*-
+import re
+import sys
+from charset_normalizer import cli
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(cli.cli_detect())
+>>>>>>> origin/main

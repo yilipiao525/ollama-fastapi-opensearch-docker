@@ -1,4 +1,4 @@
-fastapi[standards]
+fastapi[standard]
 uvicorn==0.22.0
 requests
 pydantic

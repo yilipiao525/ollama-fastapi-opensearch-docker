@@ -1,0 +1,8 @@
+fastapi[standards]
+uvicorn==0.22.0
+requests
+pydantic
+PyPDF2
+sentence-transformers
+numpy
+# opensearch-py==2.3.0

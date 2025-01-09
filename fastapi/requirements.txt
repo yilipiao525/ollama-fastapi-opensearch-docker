@@ -5,4 +5,4 @@ pydantic
 PyPDF2
 sentence-transformers
 numpy
-# opensearch-py==2.3.0
+opensearch-py==2.3.0

@@ -3,6 +3,9 @@ FROM python:3.11-slim
 WORKDIR /app
 
 COPY ./requirements.txt /app/requirements.txt
+COPY ./app.py /app/app.py
+COPY ./opensearch_client.py /app/opensearch_client.py
+
 RUN pip3 install --upgrade pip setuptools
 RUN pip3 install -r /app/requirements.txt
 

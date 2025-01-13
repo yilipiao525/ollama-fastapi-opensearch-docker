@@ -1,68 +1,78 @@
-version: '3.8'  # Updated to a more recent version for better features
+version: "3"
 
 services:
-  # FastAPI service configuration
   web:
-    build:
-      context: .  # Set build context to project root
-      dockerfile: fastapi/Dockerfile  # Specify Dockerfile path
+    build: fastapi
     ports:
-      - "8000:8000"  # Map host port 8000 to container port 8000
+      - 8000:8000
     volumes:
-      - ./fastapi:/app/fastapi  # Mount local fastapi directory to /app/fastapi in container
-      - ./opensearch:/app/opensearch  # Mount local opensearch directory to /app/opensearch in container
-      - ./pdfs:/app/pdfs  # Optional: Mount PDF directory if needed
+      - ./fastapi:/app
+      - ./opensearch:/app/opensearch
+      - ./data:/app/data
+    environment:                                  # Add this section
+      - OPENSEARCH_URL=http://opensearch:9200    # OpenSearch connection URL
+      - OLLAMA_URL=http://ollama:11434   
     networks:
-      - ollama-network  # Connect to the ollama network
+      - llama-net
     depends_on:
-      opensearch:
-        condition: service_healthy  # Wait for OpenSearch to be healthy
-      ollama:
-        condition: service_started  # Wait for Ollama to start
-    environment:
-      - OPENSEARCH_URL=http://opensearch:9200
-      - OLLAMA_URL=http://ollama:11434
-
-  # Ollama service configuration
+      - opensearch
+      - ollama
+    entrypoint: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+  
   ollama:
-    build: ollama  # Build from ./ollama/Dockerfile
+    build: ollama
     ports:
-      - "11434:11434"  # Map host port 11434 to container port 11434 (Ollama API)
+      - 11434:11434
     volumes:
-      - ollama-vol:/ollama  # Named volume for persistent Ollama data
+      - llama-vol:/ollama
     networks:
-      - ollama-network  # Connect to the ollama network
-    entrypoint: ["/usr/bin/bash", "/pull-llama.sh"]  # Run pull-llama.sh on startup
+      - llama-net
+    entrypoint: ["/usr/bin/bash", "/pull-llama.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/version && curl -sf http://localhost:11434/api/tags | grep -q 'gemma2:2b'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # OpenSearch service configuration
   opensearch:
-    image: opensearchproject/opensearch:2.9.0  # Use official OpenSearch image
+    image: opensearchproject/opensearch:2.9.0
     container_name: opensearch
     environment:
-      - discovery.type=single-node  # Single-node cluster
-      - DISABLE_SECURITY_PLUGIN=true  # Disable security for development
-      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m  # Set JVM heap size
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
     volumes:
-      - opensearch-data:/usr/share/opensearch/data  # Named volume for OpenSearch data
+      - opensearch-data:/usr/share/opensearch/data
     ports:
-      - "9200:9200"  # OpenSearch HTTP API
-      - "9600:9600"  # Performance Analyzer
+      - 9200:9200
+      - 9600:9600
     networks:
-      - ollama-network  # Connect to the ollama network
+      - llama-net
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 30s
       timeout: 10s
       retries: 5
 
-# Define named volumes for persistent data
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:2.9.0
+    container_name: opensearch-dashboards
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+    ports:
+      - "5601:5601"
+    networks:
+      - llama-net
+    depends_on:
+      - opensearch
+
+networks:
+  llama-net:
+    driver: bridge
+
 volumes:
-  ollama-vol:
+  llama-vol:
     driver: local
   opensearch-data:
     driver: local
-
-# Define networks for service communication
-networks:
-  ollama-network:
-    driver: bridge

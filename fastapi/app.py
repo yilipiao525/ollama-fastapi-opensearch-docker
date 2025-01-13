@@ -1,3 +1,5 @@
+import requests
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
@@ -37,9 +39,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configuration from environment variables
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
-OPENSEARCH_URL = os.getenv("OPENSEARCH_URL", "http://opensearch:9200")
+OLLAMA_URL =  "http://ollama:11434"   #//for docker compose
+# OLLAMA_URL =  "http://localhost:11434"  #//for local
 LLM_SERVER_URL = f"{OLLAMA_URL}/api/generate"
 MODEL_NAME = "gemma2:2b"   
 EMBEDDING_MODEL="nomic-embed-text" 

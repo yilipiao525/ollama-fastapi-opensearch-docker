@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+#!/Users/sarthak/Documents/Try/tutorial/fastapi/.venv/bin/python3.12
+=======
 #!/Users/ellenpark/Desktop/study/ollama-docker-fastapi-opensearch/fastapi/.venv/bin/python3.12
+>>>>>>> origin/main
 # -*- coding: utf-8 -*-
 import re
 import sys
